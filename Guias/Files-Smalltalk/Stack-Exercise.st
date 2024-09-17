@@ -144,6 +144,50 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 16:03:44'!
+test01FindOfAnEmptyStackShouldBeAnEmptySolution
+	|stack finder emptyCollection|
+	stack := OOStack new.
+	finder := SentenceFinderByPrefix new.
+	emptyCollection := 		OrderedCollection new.
+	
+	self assert: (finder find: 'a' in: stack) = emptyCollection.
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 16:18:26'!
+test02FindAEmptyPrefixInAStackShouldReturnAllTheElementsOfTheStack
+	|stack finder aCollection|
+	
+	stack := OOStack new.
+	
+	stack push: 'hola'. 
+	stack push: 'como'.
+	
+	finder := SentenceFinderByPrefix new.
+	aCollection := 		OrderedCollection with: 'hola' with: 'como'.
+	
+	self assert: (finder find: '' in: stack) = aCollection.
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 16:32:52'!
+test03FindIsCaseSensitive
+	|finder stack collection|
+	
+	stack := OOStack new.
+	
+	stack push: 'hola como va?'.
+	stack push: 'Hola como va?'.
+	
+	finder := SentenceFinderByPrefix new.
+	
+	collection := OrderedCollection with: 'hola como va?'.
+	
+	self assert: (finder find: 'hola' in: stack = collection). 
+	
+	
+	
+	! !
+
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
@@ -169,8 +213,8 @@ pop
 popFromEmptyStack
 	^self error: self class stackEmptyErrorDescription.! !
 
-!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/15/2024 20:09:13'!
-popFromNomEmptyStack
+!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/17/2024 16:37:17'!
+popFromNonEmptyStack
 	"Aca nos queda revisar que pasa cuando llegamos a cero para cmabiar el estado de nuevo a empty"
 	|popedElement index classState|
 	popedElement := stack removeFirst.
@@ -185,9 +229,9 @@ push: aElement
 	stackState push: aElement to: self.
 	! !
 
-!OOStack methodsFor: 'push Methods' stamp: 'GL 9/15/2024 18:39:57'!
+!OOStack methodsFor: 'push Methods' stamp: 'GL 9/17/2024 16:36:02'!
 pushToAEmptyStack: anElement
-	stackState := NomEmptyStack new.
+	stackState := NonEmptyStack new.
 	stack addFirst: anElement.
 	
 	! !
@@ -209,8 +253,8 @@ initialize
 top
 	^stackState top: self.! !
 
-!OOStack methodsFor: 'top methods' stamp: 'GL 9/15/2024 18:44:20'!
-topANomEmptyStack
+!OOStack methodsFor: 'top methods' stamp: 'GL 9/17/2024 16:37:52'!
+topANonEmptyStack
 	 ^stack first! !
 
 !OOStack methodsFor: 'top methods' stamp: 'GL 9/15/2024 18:43:48'!
@@ -235,6 +279,9 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 16:04:05'!
+find: aPrefix in: aStack! !
 
 
 !classDefinition: #StateStack category: #'Stack-Exercise'!
@@ -288,25 +335,25 @@ top: aStack
 	^aStack topAnEmptyStack. ! !
 
 
-!classDefinition: #NomEmptyStack category: #'Stack-Exercise'!
-StateStack subclass: #NomEmptyStack
+!classDefinition: #NonEmptyStack category: #'Stack-Exercise'!
+StateStack subclass: #NonEmptyStack
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:53:49'!
+!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:53:49'!
 isEmpty
 	^false.! !
 
-!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:29:24'!
+!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 16:37:17'!
 pop: aStack
-	^aStack popFromNomEmptyStack. ! !
+	^aStack popFromNonEmptyStack. ! !
 
-!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:40:53'!
+!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:40:53'!
 push: anElement to: aStack
 	aStack pushToANonEmptyStack: anElement. ! !
 
-!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:46:09'!
+!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 16:37:52'!
 top: aStack
-	^aStack topANomEmptyStack. ! !
+	^aStack topANonEmptyStack. ! !
