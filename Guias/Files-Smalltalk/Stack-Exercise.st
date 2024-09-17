@@ -152,34 +152,70 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:53:15'!
+!OOStack methodsFor: 'accessing' stamp: 'GL 9/15/2024 18:22:16'!
 isEmpty
-	stackState isEmpty.! !
-
-!OOStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:38:44'!
-pop
-	(stack isEmpty) ifTrue: [ ^self error: self class stackEmptyErrorDescription ].
-	^stack removeFirst.! !
-
-!OOStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:20:40'!
-push: aElement
-	stack addFirst: aElement.
-	! !
+	^stackState isEmpty.! !
 
 !OOStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:20:34'!
 size
 	^stack size. ! !
 
-!OOStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:38:49'!
-top
-	(stack isEmpty) ifTrue: [self error: self class stackEmptyErrorDescription ].
-	^stack first. ! !
+
+!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/15/2024 18:47:00'!
+pop
+	^stackState pop: self.! !
+
+!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/15/2024 18:28:03'!
+popFromEmptyStack
+	^self error: self class stackEmptyErrorDescription.! !
+
+!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/15/2024 20:09:13'!
+popFromNomEmptyStack
+	"Aca nos queda revisar que pasa cuando llegamos a cero para cmabiar el estado de nuevo a empty"
+	|popedElement index classState|
+	popedElement := stack removeFirst.
+	index := (stack size sign) + 1.
+	classState := StateStack subclasses at: index. 
+	stackState := classState new. 
+	^popedElement.! !
 
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:48:14'!
+!OOStack methodsFor: 'push Methods' stamp: 'GL 9/15/2024 18:46:52'!
+push: aElement
+	stackState push: aElement to: self.
+	! !
+
+!OOStack methodsFor: 'push Methods' stamp: 'GL 9/15/2024 18:39:57'!
+pushToAEmptyStack: anElement
+	stackState := NomEmptyStack new.
+	stack addFirst: anElement.
+	
+	! !
+
+!OOStack methodsFor: 'push Methods' stamp: 'GL 9/15/2024 18:38:47'!
+pushToANonEmptyStack: anElement
+	stack addFirst: anElement.
+	
+! !
+
+
+!OOStack methodsFor: 'initialization' stamp: 'l 9/13/2024 21:48:14'!
 initialize
 	stackState := EmptyStack new.
 	stack := OrderedCollection new.! !
+
+
+!OOStack methodsFor: 'top methods' stamp: 'GL 9/15/2024 18:46:27'!
+top
+	^stackState top: self.! !
+
+!OOStack methodsFor: 'top methods' stamp: 'GL 9/15/2024 18:44:20'!
+topANomEmptyStack
+	 ^stack first! !
+
+!OOStack methodsFor: 'top methods' stamp: 'GL 9/15/2024 18:43:48'!
+topAnEmptyStack
+	^self error: self class stackEmptyErrorDescription. ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -213,8 +249,17 @@ isEmpty
 
 	self subclassResponsibility! !
 
-!StateStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:54:42'!
-pop
+!StateStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:28:57'!
+pop: aStack
+	self subclassResponsibility! !
+
+!StateStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:37:15'!
+push: anElement to: aStack
+
+	self subclassResponsibility! !
+
+!StateStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:45:28'!
+top: aStack
 
 	self subclassResponsibility! !
 
@@ -230,20 +275,38 @@ StateStack subclass: #EmptyStack
 isEmpty
 	^true.! !
 
-!EmptyStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:54:42'!
-pop! !
+!EmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:28:41'!
+pop: aStack
+	aStack popFromEmptyStack. ! !
+
+!EmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 20:01:01'!
+push: anElement to: aStack
+	aStack pushToAEmptyStack: anElement.! !
+
+!EmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:45:52'!
+top: aStack
+	^aStack topAnEmptyStack. ! !
 
 
-!classDefinition: #StackWithElements category: #'Stack-Exercise'!
-StateStack subclass: #StackWithElements
+!classDefinition: #NomEmptyStack category: #'Stack-Exercise'!
+StateStack subclass: #NomEmptyStack
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackWithElements methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:53:49'!
+!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:53:49'!
 isEmpty
 	^false.! !
 
-!StackWithElements methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:54:42'!
-pop! !
+!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:29:24'!
+pop: aStack
+	^aStack popFromNomEmptyStack. ! !
+
+!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:40:53'!
+push: anElement to: aStack
+	aStack pushToANonEmptyStack: anElement. ! !
+
+!NomEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:46:09'!
+top: aStack
+	^aStack topANomEmptyStack. ! !
