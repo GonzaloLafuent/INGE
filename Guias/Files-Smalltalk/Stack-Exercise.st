@@ -154,17 +154,17 @@ test01FindOfAnEmptyStackShouldBeAnEmptySolution
 	self assert: (finder find: 'a' in: stack) = emptyCollection.
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 16:18:26'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 21:43:22'!
 test02FindAEmptyPrefixInAStackShouldReturnAllTheElementsOfTheStack
 	|stack finder aCollection|
 	
 	stack := OOStack new.
 	
-	stack push: 'hola'. 
-	stack push: 'como'.
+	stack push: 'hola como va?'. 
+	stack push: 'todo bien vos?'.
 	
 	finder := SentenceFinderByPrefix new.
-	aCollection := 		OrderedCollection with: 'hola' with: 'como'.
+	aCollection := 		OrderedCollection with: 'hola como va?' with: 'todo bien vos?'.
 	
 	self assert: (finder find: '' in: stack) = aCollection.
 	! !
@@ -280,8 +280,27 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 16:04:05'!
-find: aPrefix in: aStack! !
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 21:49:15'!
+find: aPrefix in: aStack
+	|auxiliarStack elementToCompare result element|
+	
+	result := OrderedCollection new.
+	auxiliarStack := OOStack new.
+
+	[aStack isEmpty not] whileTrue:[
+		elementToCompare := aStack pop.	
+		(elementToCompare beginsWith: aPrefix) ifTrue: [result addFirst: elementToCompare].
+		auxiliarStack push: elementToCompare.
+	].
+
+	[auxiliarStack isEmpty not] whileTrue:[
+		element := auxiliarStack pop.	
+		aStack push: element.
+	].	
+	
+	^result.
+
+! !
 
 
 !classDefinition: #StateStack category: #'Stack-Exercise'!
