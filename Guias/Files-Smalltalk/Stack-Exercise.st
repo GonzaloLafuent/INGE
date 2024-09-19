@@ -139,50 +139,94 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'aStack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 16:03:44'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:33:53'!
+setUp
+	aStack := OOStack new.
+	aStack push: 'winter is coming'.
+	aStack push: 'winning is everything'.
+	aStack push: 'The winds of Winter'.
+	aStack push: 'Winter is here'.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:34:50'!
 test01FindOfAnEmptyStackShouldBeAnEmptySolution
-	|stack finder emptyCollection|
-	stack := OOStack new.
+	|emptyStack finder emptyCollection|
+	
+	emptyStack := OOStack new.
+	
 	finder := SentenceFinderByPrefix new.
 	emptyCollection := 		OrderedCollection new.
 	
-	self assert: (finder find: 'a' in: stack) = emptyCollection.
+	self assert: (finder find: 'Wint' in: emptyStack) = emptyCollection.
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 21:43:22'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:38:02'!
 test02FindAEmptyPrefixInAStackShouldReturnAllTheElementsOfTheStack
-	|stack finder aCollection|
-	
-	stack := OOStack new.
-	
-	stack push: 'hola como va?'. 
-	stack push: 'todo bien vos?'.
+	|finder expectedResult|
 	
 	finder := SentenceFinderByPrefix new.
-	aCollection := 		OrderedCollection with: 'hola como va?' with: 'todo bien vos?'.
+	expectedResult := 		OrderedCollection with: 'winter is coming' with: 'winning is everything'
+					with: 'The winds of Winter' with: 'Winter is here'.
 	
-	self assert: (finder find: '' in: stack) = aCollection.
+	self assert: (finder find: '' in: aStack) = expectedResult .
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/17/2024 16:32:52'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:40:02'!
 test03FindIsCaseSensitive
-	|finder stack collection|
-	
-	stack := OOStack new.
-	
-	stack push: 'hola como va?'.
-	stack push: 'Hola como va?'.
+	|finder expectedResult|
 	
 	finder := SentenceFinderByPrefix new.
 	
-	collection := OrderedCollection with: 'hola como va?'.
+	expectedResult := OrderedCollection with: 'Winter is here'.
 	
-	self assert: (finder find: 'hola' in: stack = collection). 
+	self assert: (finder find: 'Wint' in: aStack) = expectedResult . 
+	
+	
+	
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:50:54'!
+test04FindDoesntAlterateTheStackSize
+	|finder|
+	
+	finder := SentenceFinderByPrefix new.
+	
+	finder find: 'Wint' in: aStack. 
+	
+	self assert: aStack size  = 4 . 
+	
+	
+	
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:49:54'!
+test05ThePrefixDoesntMatchWithNoSentence
+	|finder expectedResult|
+	
+	finder := SentenceFinderByPrefix new.
+	expectedResult := 		OrderedCollection new.
+		
+	self assert: (finder find: 'Gan' in: aStack) = expectedResult .
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:53:40'!
+test06FindDoesntAlterateTheStackOrderOfElements
+	|finder stack|
+	
+	finder := SentenceFinderByPrefix new.
+	stack := OOStack new.
+	stack push: 'winter is coming'.
+	stack push: 'winning is everything'.
+	stack push: 'The winds of Winter'.
+	stack push: 'Winter is here'.
+	
+	finder find: 'Wint' in: aStack. 
+	
+	self assert: aStack top  = stack top. 
 	
 	
 	
@@ -191,67 +235,59 @@ test03FindIsCaseSensitive
 
 !classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'stackState stack'
+	instanceVariableNames: 'stack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'accessing' stamp: 'GL 9/15/2024 18:22:16'!
+!OOStack methodsFor: 'accessing' stamp: 'GL 9/18/2024 21:01:41'!
 isEmpty
-	^stackState isEmpty.! !
+	^self state isEmpty.! !
 
 !OOStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:20:34'!
 size
 	^stack size. ! !
 
+!OOStack methodsFor: 'accessing' stamp: 'GL 9/18/2024 21:03:08'!
+state
+	|indexState state|
+	
+	indexState := (self size sign) + 1.
+	state := StateStack subclasses at: indexState. 
+	
+	^state for: self. 
+	! !
 
-!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/15/2024 18:47:00'!
+
+!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/18/2024 21:02:14'!
 pop
-	^stackState pop: self.! !
+	^self state pop.! !
 
 !OOStack methodsFor: 'pop Methods' stamp: 'GL 9/15/2024 18:28:03'!
 popFromEmptyStack
 	^self error: self class stackEmptyErrorDescription.! !
 
-!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/17/2024 16:37:17'!
+!OOStack methodsFor: 'pop Methods' stamp: 'GL 9/18/2024 21:05:35'!
 popFromNonEmptyStack
-	"Aca nos queda revisar que pasa cuando llegamos a cero para cmabiar el estado de nuevo a empty"
-	|popedElement index classState|
+	|popedElement|
 	popedElement := stack removeFirst.
-	index := (stack size sign) + 1.
-	classState := StateStack subclasses at: index. 
-	stackState := classState new. 
 	^popedElement.! !
 
 
-!OOStack methodsFor: 'push Methods' stamp: 'GL 9/15/2024 18:46:52'!
+!OOStack methodsFor: 'push Methods' stamp: 'GL 9/18/2024 21:12:22'!
 push: aElement
-	stackState push: aElement to: self.
+	stack addFirst: aElement.
 	! !
 
-!OOStack methodsFor: 'push Methods' stamp: 'GL 9/17/2024 16:36:02'!
-pushToAEmptyStack: anElement
-	stackState := NonEmptyStack new.
-	stack addFirst: anElement.
-	
-	! !
 
-!OOStack methodsFor: 'push Methods' stamp: 'GL 9/15/2024 18:38:47'!
-pushToANonEmptyStack: anElement
-	stack addFirst: anElement.
-	
-! !
-
-
-!OOStack methodsFor: 'initialization' stamp: 'l 9/13/2024 21:48:14'!
+!OOStack methodsFor: 'initialization' stamp: 'GL 9/18/2024 21:04:05'!
 initialize
-	stackState := EmptyStack new.
 	stack := OrderedCollection new.! !
 
 
-!OOStack methodsFor: 'top methods' stamp: 'GL 9/15/2024 18:46:27'!
+!OOStack methodsFor: 'top methods' stamp: 'GL 9/18/2024 21:11:41'!
 top
-	^stackState top: self.! !
+	^self state top.! !
 
 !OOStack methodsFor: 'top methods' stamp: 'GL 9/17/2024 16:37:52'!
 topANonEmptyStack
@@ -280,54 +316,74 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 21:49:15'!
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/18/2024 18:30:04'!
 find: aPrefix in: aStack
-	|auxiliarStack elementToCompare result element|
-	
-	result := OrderedCollection new.
-	auxiliarStack := OOStack new.
+	|result|
 
-	[aStack isEmpty not] whileTrue:[
-		elementToCompare := aStack pop.	
-		(elementToCompare beginsWith: aPrefix) ifTrue: [result addFirst: elementToCompare].
-		auxiliarStack push: elementToCompare.
+	result := OrderedCollection new.
+
+	self whileStackIsNotEmpty: aStack do: [:element| 
+		(element beginsWith: aPrefix) ifTrue: [result addFirst: element].
 	].
 
-	[auxiliarStack isEmpty not] whileTrue:[
-		element := auxiliarStack pop.	
-		aStack push: element.
-	].	
-	
 	^result.
 
 ! !
 
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/18/2024 18:31:51'!
+revertStack: aStackToRevert to: aRevertedStack
+	[aStackToRevert isEmpty not] whileTrue:[
+		aRevertedStack push: (aStackToRevert pop). 
+	].
+! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/18/2024 18:26:02'!
+whileStackIsNotEmpty: aStack do: aBlockToExecute
+	|element auxiliarStack|
+	auxiliarStack := OOStack new.
+	
+	[aStack isEmpty not] whileTrue:[
+		element := (auxiliarStack push: aStack pop) top.	
+		aBlockToExecute value: element. 
+	].
+	
+	self revertStack: auxiliarStack to: aStack. ! !
+
 
 !classDefinition: #StateStack category: #'Stack-Exercise'!
 Object subclass: #StateStack
-	instanceVariableNames: ''
+	instanceVariableNames: 'stack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StateStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:53:32'!
+!StateStack methodsFor: 'initialization' stamp: 'GL 9/18/2024 20:58:13'!
+for: aStack
+	stack := aStack.! !
+
+
+!StateStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:53:32'!
 isEmpty
 
 	self subclassResponsibility! !
 
-!StateStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:28:57'!
-pop: aStack
-	self subclassResponsibility! !
+!StateStack methodsFor: 'accessing' stamp: 'GL 9/18/2024 21:09:49'!
+pop
+	self subclassResponsibility. ! !
 
-!StateStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:37:15'!
-push: anElement to: aStack
+!StateStack methodsFor: 'accessing' stamp: 'GL 9/18/2024 21:09:43'!
+top
+	self subclassResponsibility. ! !
 
-	self subclassResponsibility! !
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!StateStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:45:28'!
-top: aStack
+!classDefinition: 'StateStack class' category: #'Stack-Exercise'!
+StateStack class
+	instanceVariableNames: ''!
 
-	self subclassResponsibility! !
+!StateStack class methodsFor: 'as yet unclassified' stamp: 'GL 9/18/2024 20:57:52'!
+for: aStack
+	^self new for: aStack.! !
 
 
 !classDefinition: #EmptyStack category: #'Stack-Exercise'!
@@ -337,21 +393,17 @@ StateStack subclass: #EmptyStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!EmptyStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:53:41'!
+!EmptyStack methodsFor: 'accesing' stamp: 'l 9/13/2024 21:53:41'!
 isEmpty
 	^true.! !
 
-!EmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:28:41'!
-pop: aStack
-	aStack popFromEmptyStack. ! !
+!EmptyStack methodsFor: 'accesing' stamp: 'GL 9/18/2024 20:59:19'!
+pop
+	stack popFromEmptyStack. ! !
 
-!EmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 20:01:01'!
-push: anElement to: aStack
-	aStack pushToAEmptyStack: anElement.! !
-
-!EmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:45:52'!
-top: aStack
-	^aStack topAnEmptyStack. ! !
+!EmptyStack methodsFor: 'accesing' stamp: 'GL 9/18/2024 21:00:39'!
+top
+	^stack topAnEmptyStack. ! !
 
 
 !classDefinition: #NonEmptyStack category: #'Stack-Exercise'!
@@ -361,18 +413,14 @@ StateStack subclass: #NonEmptyStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'l 9/13/2024 21:53:49'!
+!NonEmptyStack methodsFor: 'accessing' stamp: 'l 9/13/2024 21:53:49'!
 isEmpty
 	^false.! !
 
-!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 16:37:17'!
-pop: aStack
-	^aStack popFromNonEmptyStack. ! !
+!NonEmptyStack methodsFor: 'accessing' stamp: 'GL 9/18/2024 21:00:53'!
+pop
+	^stack popFromNonEmptyStack. ! !
 
-!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/15/2024 18:40:53'!
-push: anElement to: aStack
-	aStack pushToANonEmptyStack: anElement. ! !
-
-!NonEmptyStack methodsFor: 'as yet unclassified' stamp: 'GL 9/17/2024 16:37:52'!
-top: aStack
-	^aStack topANonEmptyStack. ! !
+!NonEmptyStack methodsFor: 'accessing' stamp: 'GL 9/18/2024 21:01:17'!
+top
+	^stack topANonEmptyStack. ! !
