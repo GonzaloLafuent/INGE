@@ -152,34 +152,34 @@ setUp
 	aStack push: 'The winds of Winter'.
 	aStack push: 'Winter is here'.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:34:50'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/19/2024 12:24:12'!
 test01FindOfAnEmptyStackShouldBeAnEmptySolution
-	|emptyStack finder emptyCollection|
+	|emptyStack finder expectedResult|
 	
 	emptyStack := OOStack new.
 	
-	finder := SentenceFinderByPrefix new.
-	emptyCollection := 		OrderedCollection new.
+	finder := SentenceFinderByPrefix for: emptyStack.
+	expectedResult := 		OrderedCollection new.
 	
-	self assert: (finder find: 'Wint' in: emptyStack) = emptyCollection.
+	self assert: (finder find: 'Wint' in: emptyStack) = expectedResult.
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:38:02'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/19/2024 12:24:23'!
 test02FindAEmptyPrefixInAStackShouldReturnAllTheElementsOfTheStack
 	|finder expectedResult|
 	
-	finder := SentenceFinderByPrefix new.
+	finder := SentenceFinderByPrefix for: aStack.
 	expectedResult := 		OrderedCollection with: 'winter is coming' with: 'winning is everything'
 					with: 'The winds of Winter' with: 'Winter is here'.
 	
 	self assert: (finder find: '' in: aStack) = expectedResult .
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:40:02'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/19/2024 12:24:35'!
 test03FindIsCaseSensitive
 	|finder expectedResult|
 	
-	finder := SentenceFinderByPrefix new.
+	finder := SentenceFinderByPrefix for: aStack.
 	
 	expectedResult := OrderedCollection with: 'Winter is here'.
 	
@@ -189,11 +189,11 @@ test03FindIsCaseSensitive
 	
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:50:54'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/19/2024 12:24:45'!
 test04FindDoesntAlterateTheStackSize
 	|finder|
 	
-	finder := SentenceFinderByPrefix new.
+	finder := SentenceFinderByPrefix for: aStack.
 	
 	finder find: 'Wint' in: aStack. 
 	
@@ -203,21 +203,22 @@ test04FindDoesntAlterateTheStackSize
 	
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:49:54'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/19/2024 12:24:54'!
 test05ThePrefixDoesntMatchWithNoSentence
 	|finder expectedResult|
 	
-	finder := SentenceFinderByPrefix new.
+	finder := SentenceFinderByPrefix for: aStack.
 	expectedResult := 		OrderedCollection new.
 		
 	self assert: (finder find: 'Gan' in: aStack) = expectedResult .
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/18/2024 20:53:40'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'GL 9/19/2024 12:25:17'!
 test06FindDoesntAlterateTheStackOrderOfElements
 	|finder stack|
 	
-	finder := SentenceFinderByPrefix new.
+	finder := SentenceFinderByPrefix for: aStack.
+	
 	stack := OOStack new.
 	stack push: 'winter is coming'.
 	stack push: 'winning is everything'.
@@ -311,18 +312,16 @@ stackEmptyErrorDescription
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: ''
+	instanceVariableNames: 'stack backupStack result'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/18/2024 18:30:04'!
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/19/2024 12:22:19'!
 find: aPrefix in: aStack
-	|result|
-
 	result := OrderedCollection new.
-
-	self whileStackIsNotEmpty: aStack do: [:element| 
+	
+	self selectSentencesBy: [ :element| 
 		(element beginsWith: aPrefix) ifTrue: [result addFirst: element].
 	].
 
@@ -330,24 +329,38 @@ find: aPrefix in: aStack
 
 ! !
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/18/2024 18:31:51'!
-revertStack: aStackToRevert to: aRevertedStack
-	[aStackToRevert isEmpty not] whileTrue:[
-		aRevertedStack push: (aStackToRevert pop). 
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/19/2024 12:27:45'!
+initializeWith: aStack
+	stack := aStack.
+	backupStack := OOStack new.! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/19/2024 12:28:02'!
+restoreStack
+	[backupStack isEmpty not] whileTrue:[
+		stack push: (backupStack pop). 
 	].
 ! !
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/18/2024 18:26:02'!
-whileStackIsNotEmpty: aStack do: aBlockToExecute
-	|element auxiliarStack|
-	auxiliarStack := OOStack new.
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'GL 9/19/2024 12:28:11'!
+selectSentencesBy: aBlockToExecute
+	|element|
 	
-	[aStack isEmpty not] whileTrue:[
-		element := (auxiliarStack push: aStack pop) top.	
+	[stack isEmpty not] whileTrue:[
+		element := (backupStack push: stack pop) top.	
 		aBlockToExecute value: element. 
 	].
 	
-	self revertStack: auxiliarStack to: aStack. ! !
+	self restoreStack.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'GL 9/19/2024 12:15:21'!
+for: aStack
+	^self new initializeWith: aStack.! !
 
 
 !classDefinition: #StateStack category: #'Stack-Exercise'!
