@@ -5,165 +5,274 @@ TestCase subclass: #MarsRoverLogTest
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
 
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 19:53:23'!
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:13:51'!
 test01positionLogOfAMarsRoverWithNoPositionChangeIsEmpty
 
 	|marsRover positionLog|
 
 	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	positionLog := OrderedCollection new.
+	positionLog := PositionLog new. 
 
-	marsRover attachPositionLog: positionLog. 
+	marsRover attach: positionLog. 
 	
-	self assert: positionLog isEmpty.! !
+	self assert: positionLog display isEmpty.! !
 
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:13:32'!
-test02positionLogOfMarsRoverMovingForwardInVerticalAxisShowsOnePositionChange
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:52:29'!
+test02forwardMovementOfMarsRoverIsDisplayOnPositionLog
 
 	|marsRover positionLog|
 
 	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	positionLog := OrderedCollection new.
+	positionLog := PositionLog new.
 	
-	marsRover attachPositionLog: positionLog. 
+	marsRover attach: positionLog. 
 	marsRover process: 'f'. 
 	
-	self assert: (positionLog includes: (0@1))! !
+	self assert: (positionLog display includes: (0@1))! !
 
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:36:16'!
-test03allPositionChangesOfAMarsRoverInVerticalAxisAreDisplayInPositionLog
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 18:04:17'!
+test03backwardMovementOfAMarsRoverIsShownInPositionLog
 
 	|marsRover positionLog|
 
 	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	positionLog := OrderedCollection new.
+	positionLog := PositionLog new.
 	
-	marsRover attachPositionLog: positionLog. 
-	marsRover process: 'bf'. 
+	marsRover attach: positionLog. 
+	marsRover process: 'b'. 
 	
-	self assert: (positionLog includes: (0@-1)).
-	self assert: (positionLog includes: (0@0)).! !
+	self assert: (positionLog display includes: (0@-1)).! !
 
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:14:04'!
-test04positionLogOfMarsRoverMovingForwardInHorizontalAxisShowsOnePositionChange
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 18:04:36'!
+test04allPositionMovementsAreShownInPositionLog
 
 	|marsRover positionLog|
 
 	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingEast.
-	positionLog := OrderedCollection new.
+	positionLog := PositionLog new.
 	
-	marsRover attachPositionLog: positionLog. 
+	marsRover attach: positionLog. 
+	marsRover process: 'fbbf'. 
+	
+	self assert: (positionLog display includes: (1@0)).
+	self assert: (positionLog display includes: (0@0)).
+	self assert: (positionLog display includes: (-1@0)).
+	self assert: (positionLog display includes: (0@0))! !
+
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:41:36'!
+test05movementLogOfAMarsRoverWithNoPositionChangeIsEmpty
+
+	|marsRover movementLog|
+
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
+	movementLog := MovementLog new.
+
+	marsRover attach: movementLog. 
+	
+	self assert: movementLog display isEmpty.! !
+
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:43:40'!
+test06forwardMovemenOfMarsRoverIsShownInMovementLog
+
+	|marsRover movementLog|
+
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
+	movementLog := MovementLog new.
+	
+	marsRover attach: movementLog. 
 	marsRover process: 'f'. 
 	
-	self assert: (positionLog includes: (1@0))! !
+	self assert: (movementLog display includes: (0@1))! !
 
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:15:50'!
-test05allPositionChangesOfAMarsRoverInHorizontalAxisAreDisplayInPositionLog
-
-	|marsRover positionLog|
-
-	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingEast.
-	positionLog := OrderedCollection new.
-	
-	marsRover attachPositionLog: positionLog. 
-	marsRover process: 'fb'. 
-	
-	self assert: (positionLog includes: (1@0)).
-	self assert: (positionLog includes: (0@0)).! !
-
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:30:46'!
-test06movementLogOfAMarsRoverWithNoPositionChangeIsEmpty
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:44:40'!
+test07backwardMovementOfMarsRoverIsShownInMovementLog
 
 	|marsRover movementLog|
 
 	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	movementLog := OrderedCollection new.
-
-	marsRover attachMovementLog: movementLog. 
+	movementLog := MovementLog new.
 	
-	self assert: movementLog isEmpty.! !
+	marsRover attach: movementLog. 
+	marsRover process: 'b'. 
+	
+	self assert: (movementLog display includes: (0@-1)).! !
 
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:34:26'!
-test07movementLogOfMarsRoverMovingForwardInVerticalAxisShowsOnePositionChange
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:46:09'!
+test08rightRotationMovementIsOfMarsRoverIsDisplayOnMovementLog
 
 	|marsRover movementLog|
 
 	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	movementLog := OrderedCollection new.
+	movementLog := MovementLog new.
 	
-	marsRover attachMovementLog: movementLog. 
-	marsRover process: 'f'. 
-	
-	self assert: (movementLog includes: (0@1))! !
-
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:35:55'!
-test08allPositionChangesOfAMarsRoverInVerticalAxisAreDisplayInMovementLog
-
-	|marsRover movementLog|
-
-	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	movementLog := OrderedCollection new.
-	
-	marsRover attachMovementLog: movementLog. 
-	marsRover process: 'bf'. 
-	
-	self assert: (movementLog includes: (0@-1)).
-	self assert: (movementLog includes: (0@0)).! !
-
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:46:50'!
-test09movementLogOfMarsRoverMovingForwardInHorizontalAxisShowsOnePositionChange
-
-	|marsRover movementLog|
-
-	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingEast.
-	movementLog := OrderedCollection new.
-	
-	marsRover attachMovementLog: movementLog. 
-	marsRover process: 'f'. 
-	
-	self assert: (movementLog includes: (1@0))! !
-
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:47:55'!
-test10allPositionChangesOfAMarsRoverInHorizontalAxisAreDisplayInMovementLog
-
-	|marsRover positionLog|
-
-	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingEast.
-	positionLog := OrderedCollection new.
-	
-	marsRover attachMovementLog: positionLog. 
-	marsRover process: 'fb'. 
-	
-	self assert: (positionLog includes: (1@0)).
-	self assert: (positionLog includes: (0@0)).! !
-
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:51:46'!
-test11marsRoverRightRotationIsDisplayIn
-
-	|marsRover movementLog|
-
-	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	movementLog := OrderedCollection new.
-	
-	marsRover attachMovementLog: movementLog. 
+	marsRover attach: movementLog. 
 	marsRover process: 'r'. 
 	
-	self assert: (movementLog includes: 'a MarsRoverHeadingEast' ).
+	self assert: (movementLog display includes: 'a MarsRoverHeadingEast' ).
 ! !
 
-!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/12/2024 20:52:45'!
-test12marsRoverRightRotationIsDisplayIn
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:47:19'!
+test09leftRotationOfMarsRoverIsDisplayOnMovementLog
 
 	|marsRover movementLog|
 
 	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
-	movementLog := OrderedCollection new.
+	movementLog := MovementLog new.
 	
-	marsRover attachMovementLog: movementLog. 
-	marsRover process: 'rl'. 
+	marsRover attach: movementLog. 
+	marsRover process: 'l'. 
 	
-	self assert: (movementLog includes: 'a MarsRoverHeadingEast' ).
-	self assert: (movementLog includes: 'a MarsRoverHeadingNorth' )! !
+	self assert: (movementLog display includes: 'a MarsRoverHeadingWest' )! !
+
+!MarsRoverLogTest methodsFor: 'tests' stamp: 'GL 11/13/2024 17:51:44'!
+test10allPositionMovementAndRotationOfAMarsRoverAreDisplayInMovementLog
+
+	|marsRover positionLog|
+
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth.
+	positionLog := MovementLog new.
+	
+	marsRover attach: positionLog. 
+	marsRover process: 'flbr'. 
+	
+	self assert: (positionLog display includes: (0@1)).
+	self assert: (positionLog display includes: 'a MarsRoverHeadingWest').
+	self assert: (positionLog display includes: (1@1)).
+	self assert: (positionLog display includes: 'a MarsRoverHeadingNorth').
+	! !
+
+
+!classDefinition: #MarsRoverLogWindow category: #'MarsRover-WithHeading'!
+TestCase subclass: #MarsRoverLogWindow
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:17:31'!
+test00
+
+	|positionWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	positionWindow := PositionWindow new.
+	
+	marsRover attach: positionWindow.
+	
+	self assert: positionWindow position equals: ''. 
+	! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:27:08'!
+test01
+
+	|positionWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	positionWindow := PositionWindow new.
+	
+	marsRover attach: positionWindow.
+	marsRover process: 'f'.
+	
+	self assert: positionWindow position equals: '0@1'. 
+	! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:28:46'!
+test02
+
+	|positionWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	positionWindow := PositionWindow new.
+	
+	marsRover attach: positionWindow.
+	marsRover process: 'b'.
+	
+	self assert: positionWindow position equals: '0@ -1'. 
+	! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:28:09'!
+test03
+
+	|positionWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	positionWindow := PositionWindow new.
+	
+	marsRover attach: positionWindow.
+	marsRover process: 'ffbf'.
+	
+	self assert: positionWindow position equals: '0@2'. 
+	! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:39:11'!
+test04
+
+	|movementWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	movementWindow := MovementWindow new.
+	
+	marsRover attach: movementWindow.
+	marsRover process: 'f'.
+	
+	self assert: movementWindow position equals: '0@1'.
+	self assert: movementWindow head equals: ''. ! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:45:34'!
+test05
+
+	|movementWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	movementWindow := MovementWindow new.
+	
+	marsRover attach: movementWindow.
+	marsRover process: 'b'.
+	
+	self assert: movementWindow position equals: '0@ -1'.
+	self assert: movementWindow head equals: ''. ! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:39:53'!
+test06
+
+	|movementWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	movementWindow := MovementWindow new.
+	
+	marsRover attach: movementWindow.
+	marsRover process: 'r'.
+	
+	self assert: movementWindow position equals: ''.
+	self assert: movementWindow head equals: 'a MarsRoverHeadingEast'. ! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:41:52'!
+test07
+
+	|movementWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	movementWindow := MovementWindow new.
+	
+	marsRover attach: movementWindow.
+	marsRover process: 'l'.
+	
+	self assert: movementWindow position equals: ''.
+	self assert: movementWindow head equals: 'a MarsRoverHeadingWest'. ! !
+
+!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:45:03'!
+test08
+
+	|movementWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	movementWindow := MovementWindow new.
+	
+	marsRover attach: movementWindow.
+	marsRover process: 'fflbr'.
+	
+	self assert: movementWindow position equals: '1@2'.
+	self assert: movementWindow head equals: 'a MarsRoverHeadingNorth'. ! !
 
 
 !classDefinition: #MarsRoverTest category: #'MarsRover-WithHeading'!
@@ -417,15 +526,17 @@ headWest
 	
 	^head := MarsRoverHeadingWest for: self ! !
 
-!MarsRover methodsFor: 'heading' stamp: 'GL 11/12/2024 20:54:19'!
+!MarsRover methodsFor: 'heading' stamp: 'GL 11/13/2024 17:10:22'!
 rotateLeft
 	
-	^movementLog add: head rotateLeft asString.! !
+	head rotateLeft.
+	subject notifyStateChange: (RotationVisitor with: head). ! !
 
-!MarsRover methodsFor: 'heading' stamp: 'GL 11/12/2024 20:54:23'!
+!MarsRover methodsFor: 'heading' stamp: 'GL 11/13/2024 17:10:28'!
 rotateRight
 	
-	^movementLog add: head rotateRight asString.! !
+	head rotateRight.
+	subject notifyStateChange: (RotationVisitor with: head).! !
 
 
 !MarsRover methodsFor: 'testing' stamp: 'HAW 10/7/2021 20:16:32'!
@@ -454,15 +565,11 @@ isRotateRightCommand: aCommand
 	^aCommand = $r! !
 
 
-!MarsRover methodsFor: 'moving' stamp: 'GL 11/12/2024 20:37:27'!
+!MarsRover methodsFor: 'moving' stamp: 'GL 11/13/2024 17:10:57'!
 moveBackward
 	
-	|positionChange|
-	
-	positionChange := head moveBackward. 
-	positionLog ifNotNil: [positionLog add: positionChange ].
-	movementLog ifNotNil: [movementLog add: positionChange ].
-! !
+	head moveBackward. 
+	subject  notifyStateChange: (PositionVisitor with: position).! !
 
 !MarsRover methodsFor: 'moving' stamp: 'GL 11/12/2024 20:27:53'!
 moveEast
@@ -470,14 +577,11 @@ moveEast
 	^position := position + (1@0).
 	! !
 
-!MarsRover methodsFor: 'moving' stamp: 'GL 11/12/2024 20:33:48'!
+!MarsRover methodsFor: 'moving' stamp: 'GL 11/13/2024 17:11:20'!
 moveForward
 	
-	|positionChange|
-	
-	positionChange := head  moveForward. 
-	positionLog ifNotNil: [positionLog add: positionChange] .
-	movementLog ifNotNil: [movementLog add: positionChange ] ! !
+	head  moveForward. 
+	subject notifyStateChange: (PositionVisitor with: position).! !
 
 !MarsRover methodsFor: 'moving' stamp: 'GL 11/12/2024 20:28:02'!
 moveNorth
@@ -716,38 +820,142 @@ Object subclass: #Observer
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
 
+!Observer methodsFor: 'visit' stamp: 'GL 11/13/2024 16:47:05'!
+accept: aVisitor
+
+	self subclassResponsibility! !
+
 
 !classDefinition: #MovementLog category: #'MarsRover-WithHeading'!
 Observer subclass: #MovementLog
-	instanceVariableNames: ''
+	instanceVariableNames: 'displayLog'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
 
-!MovementLog methodsFor: 'accessing' stamp: 'GL 11/12/2024 20:58:43'!
-display! !
+!MovementLog methodsFor: 'accessing' stamp: 'GL 11/13/2024 16:49:36'!
+addToLog: aMovement
+
+	displayLog add: aMovement. ! !
+
+!MovementLog methodsFor: 'accessing' stamp: 'GL 11/13/2024 16:45:24'!
+display
+
+	^displayLog.! !
 
 
-!MovementLog methodsFor: 'intialization' stamp: 'GL 11/12/2024 20:59:53'!
+!MovementLog methodsFor: 'intialization' stamp: 'GL 11/13/2024 16:45:37'!
 initialize 
-	! !
+	
+	displayLog := OrderedCollection new. ! !
+
+
+!MovementLog methodsFor: 'visit' stamp: 'GL 11/13/2024 17:22:50'!
+accept: aVisitor
+
+	aVisitor visitMovementLog: self.! !
+
+
+!classDefinition: #MovementWindow category: #'MarsRover-WithHeading'!
+Observer subclass: #MovementWindow
+	instanceVariableNames: 'actualPosition actualHeading position head'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!MovementWindow methodsFor: 'accessing' stamp: 'GL 11/13/2024 18:36:27'!
+head
+	
+	^head.! !
+
+!MovementWindow methodsFor: 'accessing' stamp: 'GL 11/13/2024 18:35:34'!
+position
+	
+	^position.! !
+
+!MovementWindow methodsFor: 'accessing' stamp: 'GL 11/13/2024 18:41:11'!
+updateHead: aHeadRotation 
+
+	head := aHeadRotation asString. 	! !
+
+!MovementWindow methodsFor: 'accessing' stamp: 'GL 11/13/2024 18:38:33'!
+updatePosition: aPosition 
+	
+	position := aPosition asString. ! !
+
+
+!MovementWindow methodsFor: 'initialization' stamp: 'GL 11/13/2024 18:36:06'!
+initialize
+	
+	position := ''.
+	head := ''.! !
+
+
+!MovementWindow methodsFor: 'visit' stamp: 'GL 11/13/2024 18:37:51'!
+accept: aVisitor
+	
+	aVisitor visitMovementWindow: self.! !
 
 
 !classDefinition: #PositionLog category: #'MarsRover-WithHeading'!
 Observer subclass: #PositionLog
-	instanceVariableNames: ''
+	instanceVariableNames: 'displayLog'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
 
-!PositionLog methodsFor: 'accesing' stamp: 'GL 11/12/2024 21:00:12'!
+!PositionLog methodsFor: 'accesing' stamp: 'GL 11/13/2024 16:49:52'!
+addToLog: aPosition
+
+	displayLog add: aPosition. ! !
+
+!PositionLog methodsFor: 'accesing' stamp: 'GL 11/13/2024 16:45:16'!
 display
+
+	^displayLog. ! !
+
+
+!PositionLog methodsFor: 'initialization' stamp: 'GL 11/13/2024 16:46:21'!
+initialize
+	
+	displayLog := OrderedCollection new. ! !
+
+
+!PositionLog methodsFor: 'visit' stamp: 'GL 11/13/2024 17:15:17'!
+accept: aVisitor
+
+	aVisitor visitPositionLog: self.
 ! !
 
+
+!classDefinition: #PositionWindow category: #'MarsRover-WithHeading'!
+Observer subclass: #PositionWindow
+	instanceVariableNames: 'actualPosition position'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
 
-!PositionLog methodsFor: 'initialization' stamp: 'GL 11/12/2024 21:00:38'!
+!PositionWindow methodsFor: 'accessing' stamp: 'GL 11/13/2024 18:18:02'!
+position
+	
+	^position.! !
+
+!PositionWindow methodsFor: 'accessing' stamp: 'GL 11/13/2024 18:26:50'!
+updatePosition: aPosition
+
+	position := aPosition asString.! !
+
+
+!PositionWindow methodsFor: 'initialization' stamp: 'GL 11/13/2024 18:21:45'!
 initialize
-	! !
+
+	position := ''.! !
+
+
+!PositionWindow methodsFor: 'visit' stamp: 'GL 11/13/2024 18:25:50'!
+accept: aVisitor
+
+	aVisitor visitPositionWindow: self.! !
 
 
 !classDefinition: #Subject category: #'MarsRover-WithHeading'!
@@ -763,8 +971,119 @@ attach: anObserver
 	observers add: anObserver. ! !
 
 
-
-!Subject methodsFor: 'as yet unclassified' stamp: 'GL 11/12/2024 20:58:05'!
+!Subject methodsFor: 'initialization' stamp: 'GL 11/12/2024 20:58:05'!
 initialize
 
 	observers := OrderedCollection new. ! !
+
+!Subject methodsFor: 'initialization' stamp: 'GL 11/13/2024 16:53:25'!
+notifyStateChange: aStateChange
+
+	observers do: [:aObserver | aObserver accept: aStateChange ].  ! !
+
+
+!classDefinition: #Visitor category: #'MarsRover-WithHeading'!
+Object subclass: #Visitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!Visitor methodsFor: 'operation' stamp: 'GL 11/13/2024 17:00:43'!
+visitMovementLog: aMovementLog
+
+	self subclassResponsibility! !
+
+!Visitor methodsFor: 'operation' stamp: 'GL 11/13/2024 17:00:47'!
+visitPositionLog: aPositionLog
+
+	self subclassResponsibility! !
+
+
+!Visitor methodsFor: 'initialization' stamp: 'GL 11/13/2024 17:09:09'!
+initializeWith: aPosition
+
+	self subclassResponsibility! !
+
+
+!classDefinition: #PositionVisitor category: #'MarsRover-WithHeading'!
+Visitor subclass: #PositionVisitor
+	instanceVariableNames: 'position'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!PositionVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 17:02:18'!
+visitMovementLog: aMovementLog
+
+	aMovementLog  addToLog: position. ! !
+
+!PositionVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 18:38:16'!
+visitMovementWindow: aMovementWindow 
+	
+	aMovementWindow updatePosition: position.! !
+
+!PositionVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 17:02:31'!
+visitPositionLog: aPositionLog
+
+	aPositionLog addToLog: position. ! !
+
+!PositionVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 18:26:22'!
+visitPositionWindow: aPositionWindow
+
+	aPositionWindow updatePosition: position. ! !
+
+
+!PositionVisitor methodsFor: 'initialization' stamp: 'GL 11/13/2024 17:09:43'!
+initializeWith: aPosition
+
+	position := aPosition. ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PositionVisitor class' category: #'MarsRover-WithHeading'!
+PositionVisitor class
+	instanceVariableNames: ''!
+
+!PositionVisitor class methodsFor: 'instance creation' stamp: 'GL 11/13/2024 17:07:25'!
+with: aPosition
+
+	^self new initializeWith: aPosition.! !
+
+
+!classDefinition: #RotationVisitor category: #'MarsRover-WithHeading'!
+Visitor subclass: #RotationVisitor
+	instanceVariableNames: 'rotation'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MarsRover-WithHeading'!
+
+!RotationVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 17:02:44'!
+visitMovementLog: aMovementLog
+
+	aMovementLog addToLog: rotation asString. ! !
+
+!RotationVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 18:40:46'!
+visitMovementWindow: aMovementWindow 
+	
+	aMovementWindow updateHead: rotation. ! !
+
+!RotationVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 17:00:47'!
+visitPositionLog: aPositionLog! !
+
+
+!RotationVisitor methodsFor: 'initialization' stamp: 'GL 11/13/2024 17:09:27'!
+initializeWith: aRotation
+
+	rotation := aRotation. ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'RotationVisitor class' category: #'MarsRover-WithHeading'!
+RotationVisitor class
+	instanceVariableNames: ''!
+
+!RotationVisitor class methodsFor: 'instance creation' stamp: 'GL 11/13/2024 17:08:31'!
+with: aRotation
+
+	^self new initializeWith: aRotation. ! !
