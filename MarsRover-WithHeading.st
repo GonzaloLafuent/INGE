@@ -142,15 +142,15 @@ test10allPositionMovementAndRotationOfAMarsRoverAreDisplayInMovementLog
 	! !
 
 
-!classDefinition: #MarsRoverLogWindow category: #'MarsRover-WithHeading'!
-TestCase subclass: #MarsRoverLogWindow
+!classDefinition: #MarsRoverLogWindowTest category: #'MarsRover-WithHeading'!
+TestCase subclass: #MarsRoverLogWindowTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover-WithHeading'!
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:17:31'!
-test00
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:21:59'!
+test00marsRoverWithNoMovementsHasAnEmptyPositionWindow
 
 	|positionWindow marsRover|
 	
@@ -162,8 +162,8 @@ test00
 	self assert: positionWindow position equals: ''. 
 	! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:27:08'!
-test01
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:25:14'!
+test01positionDisplayTheOnlyForwardMovementOfAMarsRover
 
 	|positionWindow marsRover|
 	
@@ -176,8 +176,8 @@ test01
 	self assert: positionWindow position equals: '0@1'. 
 	! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:28:46'!
-test02
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:24:57'!
+test02positionDisplayTheOnlyBackwardMovementOfAMarsRover
 
 	|positionWindow marsRover|
 	
@@ -190,8 +190,8 @@ test02
 	self assert: positionWindow position equals: '0@ -1'. 
 	! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:28:09'!
-test03
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:24:12'!
+test03positionWindowOfAMarsRoverOnlyDisplaysThelastMovement
 
 	|positionWindow marsRover|
 	
@@ -204,8 +204,22 @@ test03
 	self assert: positionWindow position equals: '0@2'. 
 	! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:39:11'!
-test04
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:26:41'!
+test04marsRoverWithNoMovementsHasAnEmptyMovementLog
+
+	|movementWindow marsRover|
+	
+	marsRover := MarsRover at: (0@0) heading: MarsRoverHeadingNorth. 
+	movementWindow := MovementWindow new.
+	
+	marsRover attach: movementWindow.
+	marsRover process: ''.
+	
+	self assert: movementWindow position equals: ''.
+	self assert: movementWindow head equals: ''. ! !
+
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:27:23'!
+test05movementWindowDisplaysTheOnlyForwardMovementOfAMarsRover
 
 	|movementWindow marsRover|
 	
@@ -215,11 +229,11 @@ test04
 	marsRover attach: movementWindow.
 	marsRover process: 'f'.
 	
-	self assert: movementWindow position equals: '0@1'.
+	self assert: movementWindow position equals: ''.
 	self assert: movementWindow head equals: ''. ! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:45:34'!
-test05
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:28:00'!
+test06movementWindowDisplaysTheOnlyBackwardMovementOfAMarsRover
 
 	|movementWindow marsRover|
 	
@@ -232,8 +246,8 @@ test05
 	self assert: movementWindow position equals: '0@ -1'.
 	self assert: movementWindow head equals: ''. ! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:39:53'!
-test06
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:28:35'!
+test07movementWindowDisplaysTheOnlyRightRotationOfAMarsRover
 
 	|movementWindow marsRover|
 	
@@ -246,8 +260,8 @@ test06
 	self assert: movementWindow position equals: ''.
 	self assert: movementWindow head equals: 'a MarsRoverHeadingEast'. ! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:41:52'!
-test07
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:29:09'!
+test08movementWindowDisplaysTheOnlyLeftRotationOfAMarsRover
 
 	|movementWindow marsRover|
 	
@@ -260,8 +274,8 @@ test07
 	self assert: movementWindow position equals: ''.
 	self assert: movementWindow head equals: 'a MarsRoverHeadingWest'. ! !
 
-!MarsRoverLogWindow methodsFor: 'Test' stamp: 'GL 11/13/2024 18:45:03'!
-test08
+!MarsRoverLogWindowTest methodsFor: 'Test' stamp: 'GL 11/15/2024 15:29:38'!
+test09movementWindowOfAMarsRoverOnlyDisplaysThelastMovementAndRotation
 
 	|movementWindow marsRover|
 	
@@ -621,17 +635,6 @@ processCommand: aCommand
 attach: anObserver
 
 	subject attach: anObserver. ! !
-
-!MarsRover methodsFor: 'loggers' stamp: 'GL 11/12/2024 19:56:40'!
-attachMovementLog: aMovementLog 
-
-	movementLog := aMovementLog. 	
-! !
-
-!MarsRover methodsFor: 'loggers' stamp: 'GL 11/12/2024 19:36:17'!
-attachPositionLog: aPositionLog 
-	
-	positionLog := aPositionLog.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1070,6 +1073,9 @@ visitMovementWindow: aMovementWindow
 
 !RotationVisitor methodsFor: 'operation' stamp: 'GL 11/13/2024 17:00:47'!
 visitPositionLog: aPositionLog! !
+
+!RotationVisitor methodsFor: 'operation' stamp: 'GL 11/15/2024 15:20:18'!
+visitPositionWindow: aPositionWindow! !
 
 
 !RotationVisitor methodsFor: 'initialization' stamp: 'GL 11/13/2024 17:09:27'!
