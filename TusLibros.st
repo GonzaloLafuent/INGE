@@ -40,7 +40,7 @@ test00CannotCreateCartWithInvalidCredentials
 		self assert: error messageText  equals: '1|Invalid user credentials'
 	]. ! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:15:12'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:19:45'!
 test01NewlyCreatedCartIsEmpty
 
 	|cartID API| 	
@@ -51,9 +51,9 @@ test01NewlyCreatedCartIsEmpty
 				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
 				on: DateAndTime now. 
 	
-	self assert: (API listItemsOfCart: cartID) isEmpty. ! !
+	self assert: (API listItemsOfCart: cartID on: DateAndTime now) isEmpty. ! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:16:00'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:19:45'!
 test02CannotListItemsOfAnInvalidCart
 
 	|API|	
@@ -62,11 +62,11 @@ test02CannotListItemsOfAnInvalidCart
 	
 	authCartBehaviour := [:aCartId | self error: 'Invalid cart credentials'].
 	
-	self should: [API listItemsOfCart: storeTestObjectFactory invalidCartID ] 
+	self should: [API listItemsOfCart: storeTestObjectFactory invalidCartID on: DateAndTime now ] 
 		raise: Error - MessageNotUnderstood 
 		withExceptionDo: [:error | self assert: error messageText equals: '1|Invalid cart credentials'].! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:16:31'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:10:58'!
 test03CannotAddItemToAnInvalidCart
 	
 	|API|	
@@ -77,12 +77,12 @@ test03CannotAddItemToAnInvalidCart
 	self should: [
 				API addItem: storeTestObjectFactory itemSellByTheStore 
 		                   withAnAmount: 45 
-				     toCart: storeTestObjectFactory invalidCartID 
+				     toCart: storeTestObjectFactory invalidCartID on: DateAndTime now 
 	] raise: Error - MessageNotUnderstood 
 	  withExceptionDo: [:error | self assert: error messageText equals: '1|Invalid cart credentials'].! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:17:05'!
-test04CannotAddAnItemThatDosentBelongToTheStore
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:19:45'!
+test04CannotAddAnItemThatDoesntBelongToTheStore
 
 	|API cartID |	
 	
@@ -90,16 +90,18 @@ test04CannotAddAnItemThatDosentBelongToTheStore
 	cartID := API createCarFor: storeTestObjectFactory validUser 
 				acceptingItemsOf: storeTestObjectFactory defaultCatalog on: DateAndTime now.
 	
-	self should: [API addItem: storeTestObjectFactory itemNotSellByTheStore 
-				     withAnAmount: 1 toCart: cartID.] 
-		raise: Error - MessageNotUnderstood 
-		withExceptionDo: [:error |
-			self assert: error messageText equals: '1|Item is not in catalog'.
-			self assert: (API listItemsOfCart: cartID) isEmpty. 
-		]
+	self should: [
+				API addItem: storeTestObjectFactory itemNotSellByTheStore 
+				      withAnAmount: 1 
+				      toCart: cartID on: DateAndTime now.
+	] raise: Error - MessageNotUnderstood 
+	  withExceptionDo: [:error |
+		self assert: error messageText equals: '1|Item is not in catalog'.
+		self assert: (API listItemsOfCart: cartID on: DateAndTime now) isEmpty. 
+	]
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:19:59'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:19:45'!
 test05CannotAddAnItemWithAndInvalidQuantity
 
 	|API cartID |	
@@ -112,15 +114,15 @@ test05CannotAddAnItemWithAndInvalidQuantity
 	
 	self should: [
 		API addItem: storeTestObjectFactory itemSellByTheStore 
-			withAnAmount: -1 toCart: cartID.
+			withAnAmount: -1 toCart: cartID on: DateAndTime now.
 	] raise: Error - MessageNotUnderstood 
 	  withExceptionDo: [:error |
 			self assert: error messageText equals:  '1|',cartID invalidQuantityErrorMessage.
-			self assert: (API listItemsOfCart: cartID) isEmpty. 
+			self assert: (API listItemsOfCart: cartID on: DateAndTime now) isEmpty. 
 		]
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:20:11'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:19:45'!
 test06CartRemembersAllItemsAdded
 
 	|API cartID |	
@@ -131,14 +133,14 @@ test06CartRemembersAllItemsAdded
 				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
 				on: DateAndTime now.
 	
-	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 1 toCart: cartID. 
-	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 2 toCart: cartID.
+	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 1 toCart: cartID on: DateAndTime now. 
+	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 2 toCart: cartID on: DateAndTime now.
  
-	self assert: ((API listItemsOfCart: cartID) occurrencesOf: storeTestObjectFactory itemSellByTheStore ) equals: 3. 
+	self assert: ((API listItemsOfCart: cartID on: DateAndTime now) occurrencesOf: storeTestObjectFactory itemSellByTheStore ) equals: 3. 
 
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:22:06'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:22:28'!
 test07cannotCheckOutAndInvalidCart
 
 	|API salesBook|	
@@ -150,41 +152,16 @@ test07cannotCheckOutAndInvalidCart
 	authCartBehaviour := [:cartId| self error: 'Invalid cart id'] .
 	
 	self should: [API checkoutCart: storeTestObjectFactory invalidCartID 
-					withCardNumber: storeTestObjectFactory validCardNumber 
-					expirationDate: storeTestObjectFactory validCartExpirationDate 
-					andCardOwner: storeTestObjectFactory validCardOwner 
-					through: self 
-					registerOn: salesBook ] 
+							with: storeTestObjectFactory notExpiredCreditCard 
+					        through: self on: DateAndTime now 
+	] 
 		raise: Error 
 		withExceptionDo: [:error |
 			self assert: error messageText equals: '1|Invalid cart id'.
 			self assert: salesBook isEmpty.  
 		].! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 16:18:38'!
-test08cannotCheckOutACartWithAnInvalidCardOwner
-
-	|API cartID user|	
-	
-	API := ApiInternFace withAuthentication: self.
-	user := storeTestObjectFactory validUser.
-
-	cartID := API createCarFor: user 
-				 acceptingItemsOf: storeTestObjectFactory defaultCatalog  
-			        on: DateAndTime now.	
-	
-	self should: [API checkoutCart: cartID 
-					withCardNumber: storeTestObjectFactory validCardNumber 
-					expirationDate: storeTestObjectFactory validCartExpirationDate 
-					andCardOwner: storeTestObjectFactory invalidCardOwner 
-					through: self 
-	] raise: Error 
-	  withExceptionDo: [:error |
-		self assert: error messageText equals: '1|Invalid card owner'.
-		self assert: user  purchases isEmpty.  
-	].! !
-
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 16:20:30'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:22:28'!
 test09cannotCheckOutACartWithAnExpireCard
 
 	|API user cartID|	
@@ -194,18 +171,20 @@ test09cannotCheckOutACartWithAnExpireCard
 	
 	cartID := API createCarFor: user  acceptingItemsOf: storeTestObjectFactory defaultCatalog on: DateAndTime now.
 	
+	API addItem: storeTestObjectFactory itemSellByTheStore 
+		withAnAmount: 1 
+		toCart: cartID on: DateAndTime now. 
+	
 	self should: [API checkoutCart: cartID 
-					withCardNumber: storeTestObjectFactory validCardNumber 
-					expirationDate: storeTestObjectFactory validCartExpirationDate 
-					andCardOwner: storeTestObjectFactory invalidCardOwner 
-					through: self 
+					with: storeTestObjectFactory expiredCreditCard 
+					through: self on: DateAndTime now 
 	] raise: Error 
 	  withExceptionDo: [:error |
-			self assert: error messageText equals: '1|Invalid card owner'.
+			self assert: error messageText equals: '1|Can not charge an expired credit card'.
 			self assert: user purchases isEmpty.  
 	].! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 16:22:56'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:22:28'!
 test10cannotCheckOutAnEmptyCart
 
 	|API cartID user|	
@@ -219,38 +198,15 @@ test10cannotCheckOutAnEmptyCart
 
 	self should: [
 		API checkoutCart: cartID 
-			withCardNumber: storeTestObjectFactory validCardNumber 
-			expirationDate: storeTestObjectFactory validCartExpirationDate 
-			andCardOwner: storeTestObjectFactory validCardOwner 
-			through: self 
+			with: storeTestObjectFactory notExpiredCreditCard 
+			through: self on: DateAndTime now 
 	] raise: Error 
 	  withExceptionDo: [:error |
 		self assert: error messageText equals: '1|Can not check out an empty cart'.
 		self assert: user purchases isEmpty.  
 	].! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 16:24:59'!
-test11cannotCheckOutWithAnExpiredCardDate
-
-	|API cartID user|	
-	
-	API := ApiInternFace withAuthentication: self.
-	user := storeTestObjectFactory validUser.
-	
-	cartID := API createCarFor: user
-				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
-				on: DateAndTime now. 
-	
-	API checkoutCart: cartID 
-		withCardNumber: storeTestObjectFactory validCardNumber 
-		expirationDate: storeTestObjectFactory validCartExpirationDate 
-		andCardOwner: storeTestObjectFactory validCardOwner 
-		through: self.
-		
-	self deny: user purchases isEmpty. 
-		! !
-
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 16:28:15'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:22:28'!
 test12canCheckoutCarWhenAllCredictCartDataIsValid
 
 	|API cartID user|	
@@ -262,42 +218,36 @@ test12canCheckoutCarWhenAllCredictCartDataIsValid
 				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
 				on: DateAndTime now. 
 	
-	API addItem: storeTestObjectFactory itemSellByTheStore 	withAnAmount: 1  toCart: cartID. 
+	API addItem: storeTestObjectFactory itemSellByTheStore 	withAnAmount: 1  toCart: cartID on: DateAndTime now. 
 	
 	API checkoutCart: cartID 
-		withCardNumber: storeTestObjectFactory validCardNumber 
-		expirationDate: storeTestObjectFactory validCartExpirationDate 
-		andCardOwner: storeTestObjectFactory validCardOwner 
-		through: self.
+		with: storeTestObjectFactory notExpiredCreditCard 
+		through: self on: DateAndTime now.
 		
 	self deny: (API listPurchaseOfUser: user) isEmpty.! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 16:34:34'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:22:28'!
 test13cannnotCheckoutWhenCartHasNoCredit
 
-	|API cartID salesBook transactionID|	
+	|API cartID |	
 	
 	API := ApiInternFace withAuthentication: self.
-	cartID := API createCarFor: storeTestObjectFactory validUserPassword 
-				acceptingItemsOf: storeTestObjectFactory defaultCatalog on: DateAndTime now. 
+	cartID := API createCarFor: storeTestObjectFactory validUser 
+				 acceptingItemsOf: storeTestObjectFactory defaultCatalog 
+				 on: DateAndTime now. 
 	
-	salesBook := OrderedCollection new. 
 	merchantProcessor := [:total :creditCard | self error: 'Credit card has no credit']. 
 	
-	API addItem: storeTestObjectFactory itemSellByTheStore 	withAnAmount: 1  toCart: cartID. 
+	API addItem: storeTestObjectFactory itemSellByTheStore 	withAnAmount: 1  toCart: cartID on: DateAndTime now. 
 	
 	self should: [
-		transactionID := API checkoutCart: cartID 
-						withCardNumber: storeTestObjectFactory validCardNumber 
-						expirationDate: storeTestObjectFactory validCartExpirationDate 
-						andCardOwner: storeTestObjectFactory validCardOwner 
-						through: self 
-						registerOn: salesBook.
+		API checkoutCart: cartID 
+			with: storeTestObjectFactory notExpiredCreditCard 
+			through: self on: DateAndTime now 
+						
 	]  raise: Error - MessageNotUnderstood 
 	   withExceptionDo: [:error |
-		self assert: salesBook isEmpty. 
-		self assert: error messageText equals: '1|','Credit card has no credit'.	
-	
+		self assert: error messageText equals: '1|Credit card has no credit'.	
 	].
 	
 ! !
@@ -327,7 +277,7 @@ test15userWithNoCheckoutsShouldHaveAnEmptyPurchaseList
 	self assert: (		API listPurchaseOfUser: storeTestObjectFactory validUser ) isEmpty. 
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 15:51:52'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:22:28'!
 test16alluserCheckoutsShouldBeInThePurchaseList
 
 	|API cartID user| 	
@@ -339,18 +289,16 @@ test16alluserCheckoutsShouldBeInThePurchaseList
 				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
 				on: DateAndTime now.
 	
-	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 2 toCart: cartID.
+	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 2 toCart: cartID on: DateAndTime now.
 	
 	API checkoutCart: cartID 
-		withCardNumber: storeTestObjectFactory validCardNumber 
-		expirationDate: storeTestObjectFactory validCartExpirationDate  
-		andCardOwner: storeTestObjectFactory validCardOwner 
-		through: self. 
+		with: storeTestObjectFactory notExpiredCreditCard 
+		through: self on: DateAndTime now. 
 	
 	self assert: (user purchases occurrencesOf: storeTestObjectFactory itemSellByTheStore) equals: 2. 
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:00:38'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:10:58'!
 test17cannotAddElementsToAnExpireCart
 
 	|API cartID| 	
@@ -358,15 +306,17 @@ test17cannotAddElementsToAnExpireCart
 	API := ApiInternFace withAuthentication: self.
 	
 	cartID := API createCarFor: storeTestObjectFactory validUserPassword 
-				  acceptingItemsOf: storeTestObjectFactory defaultCatalog on: (DateAndTime now - (Duration minutes: 35)) .  
+				  acceptingItemsOf: storeTestObjectFactory defaultCatalog 
+				  on: (DateAndTime now - (Duration minutes: 35)) .  
+	
 	self should: [
 		API addItem: storeTestObjectFactory itemSellByTheStore 
 			withAnAmount: 2 
-			toCart: cartID.
+			toCart: cartID on: DateAndTime now.
 	] raise: Error withExceptionDo: [:error | self assert: error messageText equals: '1|cart expire' ].
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:00:38'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:19:45'!
 test18cannotCheckoutAnExpireCart
 
 	|API cartID| 	
@@ -374,14 +324,15 @@ test18cannotCheckoutAnExpireCart
 	API := ApiInternFace withAuthentication: self.
 	
 	cartID := API createCarFor: storeTestObjectFactory validUserPassword 
-				  acceptingItemsOf: storeTestObjectFactory defaultCatalog on: (DateAndTime now - (Duration minutes: 35)). 
+				  acceptingItemsOf: storeTestObjectFactory defaultCatalog 
+				  on: (DateAndTime now - (Duration minutes: 35)). 
 	
-	self should: [API listItemsOfCart: cartID ] 
+	self should: [API listItemsOfCart: cartID on: DateAndTime now ] 
 		raise: Error  
 		withExceptionDo: [:error | self assert: error messageText equals: '1|cart expire'].
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/12/2024 16:01:52'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:22:28'!
 test19cannotListPurchaseOfAnExpireCart
 
 	|API cartID| 	
@@ -394,16 +345,14 @@ test19cannotListPurchaseOfAnExpireCart
 	
 	self should: [
 			API checkoutCart: cartID 
-				withCardNumber: storeTestObjectFactory validCardNumber 
-				expirationDate: storeTestObjectFactory validCartExpirationDate 
-				andCardOwner:  storeTestObjectFactory validCardOwner 
-				through: self. 
+				with: storeTestObjectFactory validCardNumber 
+				through: self on: DateAndTime now. 
 	] 
 		raise: Error  
 		withExceptionDo: [:error | self assert: error messageText equals: '1|cart expire'].
 	! !
 
-!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/11/2024 17:00:38'!
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:19:45'!
 test20cannotLitsElementsOfAnExpireCart
 
 	|API cartID| 	
@@ -411,12 +360,63 @@ test20cannotLitsElementsOfAnExpireCart
 	API := ApiInternFace withAuthentication: self.
 	
 	cartID := API createCarFor: storeTestObjectFactory validUserPassword 
-				  acceptingItemsOf: storeTestObjectFactory defaultCatalog on: (DateAndTime now - (Duration minutes: 35)). 
+				  acceptingItemsOf: storeTestObjectFactory defaultCatalog 
+				  on: (DateAndTime now - (Duration minutes: 35)). 
 	
-	self should: [API listItemsOfCart: cartID ] 
+	self should: [API listItemsOfCart: cartID on: DateAndTime now ] 
 		raise: Error  
 		withExceptionDo: [:error | self assert: error messageText equals: '1|cart expire'].
 	! !
+
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:18:30'!
+test21addItemOfACartUpdateItsExpirationDate
+	
+	|API cartID addingTime|
+	
+	API := ApiInternFace withAuthentication: self.
+	
+	cartID :=API  createCarFor: storeTestObjectFactory validUser 
+				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
+				on: DateAndTime now.
+	
+	addingTime := DateAndTime now. 
+	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 1 toCart: cartID  on: addingTime. 
+	 
+	self assert: (cartID expirationDateIs: addingTime + (Duration minutes: 30)) ! !
+
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:20:22'!
+test22listItemsOfACartUpdateItsExpirationDate
+	
+	|API cartID listingTime|
+	
+	API := ApiInternFace withAuthentication: self.
+	
+	cartID :=API  createCarFor: storeTestObjectFactory validUser 
+				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
+				on: DateAndTime now.
+	
+	listingTime := DateAndTime now. 
+	API listItemsOfCart: cartID on: listingTime.
+	 
+	self assert: (cartID expirationDateIs: listingTime + (Duration minutes: 30)) ! !
+
+!ApiInternFaceTest methodsFor: 'test' stamp: 'GL 11/15/2024 16:24:57'!
+test23checkingOutCartItemsOfACartUpdateItsExpirationDate
+	
+	|API cartID chekingOutTime|
+	
+	API := ApiInternFace withAuthentication: self.
+	
+	cartID :=API  createCarFor: storeTestObjectFactory validUser 
+				acceptingItemsOf: storeTestObjectFactory defaultCatalog 
+				on: DateAndTime now.
+
+	API addItem: storeTestObjectFactory itemSellByTheStore withAnAmount: 1 toCart: cartID on: DateAndTime now. 
+
+	chekingOutTime := DateAndTime now. 
+	API checkoutCart: cartID with: storeTestObjectFactory notExpiredCreditCard through: self on: chekingOutTime. 
+	 
+	self assert: (cartID expirationDateIs: chekingOutTime + (Duration minutes: 30)) ! !
 
 
 !ApiInternFaceTest methodsFor: 'merchantProcessorProtocol' stamp: 'GL 11/10/2024 13:32:32'!
@@ -744,14 +744,15 @@ assertValidCredictCardOwner: aCardOwner
 	^ aCardOwner size >= 30 ifTrue: [self error: 'Invalid card owner']! !
 
 
-!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/11/2024 16:21:56'!
-addItem: anItemISBN withAnAmount: anAmount toCart: anIdCart 
+!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/15/2024 16:12:30'!
+addItem: anItemISBN withAnAmount: anAmount toCart: anIdCart on: aTimeMeasurement  
 
 	[
 		authMethod authenticateCartWith: anIdCart. 
-
 		self assertCartIsExpire: anIdCart.
 
+		anIdCart updateExpirationDate: aTimeMeasurement.
+		
 		anIdCart add: anAmount of: anItemISBN . 
 	
 	] on: Error 
@@ -760,51 +761,22 @@ addItem: anItemISBN withAnAmount: anAmount toCart: anIdCart
 	 
 	! !
 
-!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/12/2024 16:02:20'!
-checkoutCart: cartId withCardNumber: aCardNumber expirationDate: anExpirationDate andCardOwner: aCardOwner through: aPayMethod    
+!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/15/2024 16:22:50'!
+checkoutCart: cartId with: aCreditCard through: aPayMethod on: aTimeMeasurement     
 	
 	[	
-		|cashier creditCard sales|
-		
+		authMethod authenticateCartWith: cartId.  
 		self assertCartIsExpire: cartId. 
-		self assertValidCredictCardOwner: aCardOwner. 
-		authMethod authenticateCartWith: cartId.  
 		
-		sales := OrderedCollection new. 
-		creditCard := CreditCard expiringOn: anExpirationDate. 
-		cashier := Cashier toCheckout: cartId 
-						    charging:  creditCard 
-						    throught: aPayMethod 
-						    on: DateAndTime now  
-						    registeringOn: sales.
-	
-		sales := cartId list. 
-		(userCarts at: cartId) updatePurchases: sales. 
+		cartId updateExpirationDate: aTimeMeasurement. 
 		
-		^cashier checkOut. 
-		
-	]on: Error do: [:error | self error: '1|', error messageText ].
-	
-	! !
-
-!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/10/2024 13:30:33'!
-checkoutCart: cartId withCardNumber: aCardNumber expirationDate: anExpirationDate andCardOwner: aCardOwner through: aPayMethod registerOn: aRegisterBook   
-	
-	[	
-		|cashier creditCard|
-		
-		self assertValidCredictCardOwner: aCardOwner. 
-		authMethod authenticateCartWith: cartId.  
-		
-		creditCard := CreditCard expiringOn: anExpirationDate. 
-		
-		cashier := Cashier toCheckout: cartId 
-						    charging:  creditCard 
-						    throught: aPayMethod 
-						    on: DateAndTime now  
-						    registeringOn: aRegisterBook.
-		
-		^cashier checkOut. 
+		(Cashier toCheckout: cartId 
+					charging:  aCreditCard 
+					throught: aPayMethod 
+					on: DateAndTime now  
+					registeringOn: OrderedCollection new) checkOut. 
+ 
+		self updateUserPurchasesWith: cartId. 
 	
 	]on: Error do: [:error | self error: '1|', error messageText ].
 	
@@ -824,13 +796,14 @@ createCarFor: anUser acceptingItemsOf: aCatalog on: aTimeOfCreation
 	] on: Error
 	  do: [:error | self error: '1|',error messageText ].	! !
 
-!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/11/2024 16:30:48'!
-listItemsOfCart: cartId 
+!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/15/2024 16:20:03'!
+listItemsOfCart: cartId on: aTimeMeasurement  
 	
 	[	
 		authMethod authenticateCartWith: cartId. 
-		
 		self assertCartIsExpire: cartId. 	
+		
+		cartId updateExpirationDate: aTimeMeasurement. 
 		
 		^cartId list. 
 	] on: Error
@@ -842,6 +815,11 @@ listPurchaseOfUser: anUser
 	authMethod authenticateUserWith: anUser . 
 	
 	^anUser purchases.! !
+
+!ApiInternFace methodsFor: 'handlers' stamp: 'GL 11/15/2024 16:02:49'!
+updateUserPurchasesWith: cartId
+
+	^ (userCarts at: cartId) updatePurchases: cartId list! !
 
 
 !ApiInternFace methodsFor: 'initialization' stamp: 'GL 11/12/2024 16:07:59'!
@@ -911,11 +889,6 @@ isEmpty
 	^items isEmpty ! !
 
 
-!Cart methodsFor: 'queries' stamp: 'GL 11/12/2024 16:07:09'!
-expirationDateIs: aDateTime
-
-	^expirationDate = aDateTime. 	! !
-
 !Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
 occurrencesOf: anItem
 
@@ -941,21 +914,27 @@ initializeAcceptingItemsOf: aCatalog on: aTimeOfCreation
 	items := OrderedCollection new.! !
 
 
-!Cart methodsFor: 'listing' stamp: 'GL 11/12/2024 16:06:37'!
-isExpiredOn: aTimeMeasure
-
-	^expirationDate < aTimeMeasure. ! !
-
 !Cart methodsFor: 'listing' stamp: 'GL 11/8/2024 21:22:37'!
 list
 
 	^items.  
 	! !
 
-!Cart methodsFor: 'listing' stamp: 'GL 11/12/2024 16:06:37'!
-updateTime
+
+!Cart methodsFor: 'expiration' stamp: 'GL 11/15/2024 16:09:19'!
+expirationDateIs: aTimeMesuarement
 	
-	expirationDate := expirationDate + (Duration minutes: 30). ! !
+	^expirationDate = aTimeMesuarement. ! !
+
+!Cart methodsFor: 'expiration' stamp: 'GL 11/12/2024 16:06:37'!
+isExpiredOn: aTimeMeasure
+
+	^expirationDate < aTimeMeasure. ! !
+
+!Cart methodsFor: 'expiration' stamp: 'GL 11/15/2024 16:12:12'!
+updateExpirationDate: aTimeMeasurement
+
+	expirationDate := aTimeMeasurement + (Duration minutes: 30).! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
